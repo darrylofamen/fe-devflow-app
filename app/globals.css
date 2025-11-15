@@ -1,3 +1,4 @@
+@import "devicon/devicon.min.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -455,6 +456,7 @@ code {
     display: grid !important;
     width: 100% !important;
 }
+
 /*
   ---break---
 */
@@ -532,6 +534,7 @@ code {
     --sidebar-border: oklch(0.929 0.013 255.508);
     --sidebar-ring: oklch(0.704 0.04 256.788);
 }
+
 /*
   ---break---
 */
@@ -568,14 +571,16 @@ code {
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.551 0.027 264.364);
 }
+
 /*
   ---break---
 */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+
+    body {
+        @apply bg-background text-foreground;
     }
 }
