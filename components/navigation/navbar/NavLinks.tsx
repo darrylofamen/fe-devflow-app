@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { Fragment } from "react";
 import { sidebarLinks } from "@/constants";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -25,7 +25,6 @@ const NavLinks = ({ isMobileNav = false }: { isMobileNav?: boolean }) => {
         const LinkComponent = (
           <Link
             href={link.route}
-            key={link.label}
             className={cn(
               isActive ? "primary-gradient text-light-900 rounded-lg" : "text-dark300_light900",
               "flex items-center justify-start gap-4 bg-transparent p-4"
@@ -42,7 +41,13 @@ const NavLinks = ({ isMobileNav = false }: { isMobileNav?: boolean }) => {
           </Link>
         );
 
-        return isMobileNav ? <SheetClose asChild>{LinkComponent}</SheetClose> : <>{LinkComponent}</>;
+        return isMobileNav ? (
+          <SheetClose asChild key={link.label}>
+            {LinkComponent}
+          </SheetClose>
+        ) : (
+          <Fragment key={link.label}>{LinkComponent}</Fragment>
+        );
       })}
     </>
   );
