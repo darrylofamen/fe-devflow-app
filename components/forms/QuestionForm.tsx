@@ -8,7 +8,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { useRef } from "react";
+import { MDXEditorMethods } from "@mdxeditor/editor";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
+
 const QuestionForm = () => {
+  const editorRef = useRef<MDXEditorMethods>(null);
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: standardSchemaResolver(AskQuestionSchema),
     defaultValues: {
@@ -53,7 +60,9 @@ const QuestionForm = () => {
               <FormLabel className="paragraph-semibold text-dark400_light800">
                 Detailed explanation of your problem <span className="text-primary-500">*</span>
               </FormLabel>
-              <FormControl>Editor Component</FormControl>
+              <FormControl>
+                <Editor markdown={field.value} editorRef={editorRef} fieldChange={field.onChange} />
+              </FormControl>
               <FormDescription className="body-regular text-light-500 mt-2.5">
                 Introduce the problem and expand on what you have put in the title.
               </FormDescription>
