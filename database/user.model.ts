@@ -1,6 +1,6 @@
 import { Document, model, models, Schema } from "mongoose";
 
-interface IUser extends Document {
+export interface IUser extends Document {
   name: string;
   username: string;
   email: string;
@@ -11,7 +11,7 @@ interface IUser extends Document {
   reputation?: number;
 }
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     username: { type: String, required: true },
