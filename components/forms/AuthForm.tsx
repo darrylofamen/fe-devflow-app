@@ -17,7 +17,6 @@ interface AuthFormProps<T extends FieldValues> {
 }
 
 const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSubmit }: AuthFormProps<T>) => {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof schema>>({
     resolver: standardSchemaResolver(schema),
     defaultValues: defaultValues as DefaultValues<T>,
