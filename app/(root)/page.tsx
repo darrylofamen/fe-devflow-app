@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
@@ -98,7 +97,7 @@ interface SearchParams {
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
-  const session = await auth();
+  // const session = await auth();
   const { query = "", filter = "" } = await searchParams;
 
   const lowerQuery = query?.toLowerCase() || "";
