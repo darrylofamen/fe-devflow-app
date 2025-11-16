@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import ROUTES from "@/constants/route";
+import ROUTES from "@/constants/routes";
 
 interface AuthFormProps<T extends FieldValues> {
   schema: z.ZodType<T>;

@@ -1,9 +1,10 @@
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import ROUTES from "@/constants/route";
+import ROUTES from "@/constants/routes";
 import LocalSearch from "@/components/search/LocalSearch";
 import HomeFilter from "@/components/filters/HomeFilter";
+import QuestionCard from "@/components/cards/QuestionCard";
 
 const questions = [
   {
@@ -11,11 +12,16 @@ const questions = [
     title: "How to use React with TypeScript?",
     description: "How can I use React with TypeScript?",
     tags: [{ _id: "1", name: "react" }],
-    author: { _id: "1", name: "John Doe" },
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
     upvotes: 100,
     answers: 20,
     views: 1000,
-    createdAt: new Date(),
+    createdAt: new Date("2021-09-01"),
   },
 
   {
@@ -23,7 +29,12 @@ const questions = [
     title: "What is the difference between useEffect and useLayoutEffect?",
     description: "When should I use useEffect vs useLayoutEffect in React?",
     tags: [{ _id: "2", name: "react-hooks" }],
-    author: { _id: "2", name: "Jane Smith" },
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
     upvotes: 85,
     answers: 12,
     views: 750,
@@ -35,7 +46,12 @@ const questions = [
     title: "How to optimize Next.js performance?",
     description: "What techniques can help improve performance in a Next.js application?",
     tags: [{ _id: "3", name: "nextjs" }],
-    author: { _id: "3", name: "Michael Lee" },
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
     upvotes: 120,
     answers: 30,
     views: 1500,
@@ -47,7 +63,12 @@ const questions = [
     title: "How to design a MongoDB schema?",
     description: "What are the best practices when designing MongoDB schemas?",
     tags: [{ _id: "4", name: "mongodb" }],
-    author: { _id: "4", name: "Alice Johnson" },
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
     upvotes: 65,
     answers: 8,
     views: 600,
@@ -59,7 +80,12 @@ const questions = [
     title: "How to write async functions in Node.js?",
     description: "What is the proper way to handle asynchronous operations in Node.js?",
     tags: [{ _id: "5", name: "nodejs" }],
-    author: { _id: "5", name: "Robert King" },
+    author: {
+      _id: "1",
+      name: "John Doe",
+      image:
+        "https://static.vecteezy.com/system/resources/previews/002/002/403/non_2x/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+    },
     upvotes: 90,
     answers: 14,
     views: 820,
@@ -98,8 +124,8 @@ const Home = async ({ searchParams }: SearchParams) => {
       </section>
       <HomeFilter />
       <div className="mt-10 flex w-full flex-col gap-6">
-        {filteredQuestions.map(({ _id, title, description, tags, author, upvotes, answers, views, createdAt }) => {
-          return <h1 key={_id}>{title}</h1>;
+        {filteredQuestions.map((question, _) => {
+          return <QuestionCard key={question._id} question={question} />;
         })}
       </div>
     </>

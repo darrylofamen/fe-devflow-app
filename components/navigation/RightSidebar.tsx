@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import ROUTES from "@/constants/route";
+import ROUTES from "@/constants/routes";
 import Image from "next/image";
 import TagCard from "@/components/cards/TagCard";
 
