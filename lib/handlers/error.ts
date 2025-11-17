@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { RequestError, ValidationError } from "@/lib/http-errors";
 import { ZodError } from "zod";
+import logger from "@/lib/logger";
 
 export type ResponseType = "api" | "server";
 
@@ -36,6 +37,12 @@ const handleError = (error: unknown, responseType: ResponseType = "server") => {
   // Custom app-defined error (RequestError or classes extending it)
   // These errors already contain a statusCode, message, and optional field errors.
   if (error instanceof RequestError) {
+    logger.error(
+      {
+        err: error,
+      },
+      `${responseType.toUpperCase()} Error: ${error.message}`
+    );
     return formatResponse(responseType, error.statusCode, error.message, error.errors);
   }
 
@@ -43,17 +50,26 @@ const handleError = (error: unknown, responseType: ResponseType = "server") => {
   // Convert ZodError → ValidationError to unify formatting across the app.
   if (error instanceof ZodError) {
     const validationError = new ValidationError(error.flatten().fieldErrors as Record<string, string[]>);
+
+    logger.error(
+      {
+        err: error,
+      },
+      `Validation Error: ${validationError.message}`
+    );
     return formatResponse(responseType, validationError.statusCode, validationError.message, validationError.errors);
   }
 
   // Standard JavaScript Error (e.g., new Error("Something broke"))
   // Treated as an internal server error → HTTP 500.
   if (error instanceof Error) {
+    logger.error(error.message);
     return formatResponse(responseType, 500, error.message);
   }
 
   // Unknown thrown value (e.g., throw "oops", throw 123, throw {})
   // Very defensive fallback → treat as unexpected error.
+  logger.error({ err: error }, "An unexpected error occurred.");
   return formatResponse(responseType, 500, "An unexpected error occurred.");
 };
 
