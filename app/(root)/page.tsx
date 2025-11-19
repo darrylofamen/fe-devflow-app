@@ -98,6 +98,7 @@ interface SearchParams {
 
 const Home = async ({ searchParams }: SearchParams) => {
   // const session = await auth();
+
   const { query = "", filter = "" } = await searchParams;
 
   const lowerQuery = query?.toLowerCase() || "";

@@ -1,13 +1,15 @@
 import { Document, model, models, Schema, Types } from "mongoose";
 
-export interface IInteraction extends Document {
+export interface IInteraction {
   user: Types.ObjectId;
   action: string;
   actionId: Types.ObjectId;
   actionType: "question" | "answer";
 }
 
-const interactionSchema = new Schema<IInteraction>(
+export interface IInteractionDoc extends IInteraction, Document {}
+
+const InteractionSchema = new Schema<IInteraction>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     action: { type: String, required: true },
@@ -17,6 +19,6 @@ const interactionSchema = new Schema<IInteraction>(
   { timestamps: true }
 );
 
-const Interaction = models?.interaction || model<IInteraction>("Interaction", interactionSchema);
+const Interaction = models?.Interaction || model<IInteraction>("Interaction", InteractionSchema);
 
 export default Interaction;
