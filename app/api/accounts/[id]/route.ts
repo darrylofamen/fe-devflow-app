@@ -1,57 +1,57 @@
 import handleError from "@/lib/handlers/error";
 import { APIErrorResponse } from "@/types/global";
 import dbConnect from "@/lib/mongoose";
-import User from "@/database/user.model";
 import { NotFoundError, ValidationError } from "@/lib/http-errors";
 import { NextResponse } from "next/server";
-import { UserSchema } from "@/lib/validation";
+import { AccountSchema } from "@/lib/validation";
+import Account from "@/database/account.model";
 
-// GET api/users/:id
+// GET api/accounts/:id
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
     await dbConnect();
 
-    const user = await User.findById(id);
-    if (!user) throw new NotFoundError("User");
+    const account = await Account.findById(id);
+    if (!account) throw new NotFoundError("Account");
 
-    return NextResponse.json({ success: true, data: user }, { status: 200 });
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }
 }
 
-// DELETE api/users/:id
+// DELETE api/accounts/:id
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
     await dbConnect();
 
-    const user = await User.findByIdAndDelete(id);
-    if (!user) throw new NotFoundError("User");
+    const account = await Account.findByIdAndDelete(id);
+    if (!account) throw new NotFoundError("Account");
 
-    return NextResponse.json({ success: true, data: user }, { status: 200 });
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }
 }
 
-// PUT api/users/:id
+// PUT api/accounts/:id
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
     const body = await request.json();
 
-    const validatedData = UserSchema.partial().safeParse(body);
+    const validatedData = AccountSchema.partial().safeParse(body);
     if (!validatedData.success) throw new ValidationError(validatedData.error.flatten().fieldErrors);
 
-    const updatedUser = await User.findByIdAndUpdate(id, validatedData.data, { new: true });
-    if (!updatedUser) throw new NotFoundError("User");
+    const updatedAccount = await Account.findByIdAndUpdate(id, validatedData.data, { new: true });
+    if (!updatedAccount) throw new NotFoundError("Account");
 
-    return NextResponse.json({ success: true, data: updatedUser }, { status: 200 });
+    return NextResponse.json({ success: true, data: updatedAccount }, { status: 200 });
   } catch (error) {
     return handleError(error, "api") as APIErrorResponse;
   }
