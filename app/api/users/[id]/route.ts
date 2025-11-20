@@ -2,14 +2,13 @@ import handleError from "@/lib/handlers/error";
 import { APIErrorResponse } from "@/types/global";
 import dbConnect from "@/lib/mongoose";
 import User from "@/database/user.model";
-import { NotFoundError } from "@/lib/http-errors";
+import { NotFoundError, ValidationError } from "@/lib/http-errors";
 import { NextResponse } from "next/server";
 import { UserSchema } from "@/lib/validation";
 
 // GET api/users/:id
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!id) throw new Error("User ID is required");
 
   try {
     await dbConnect();
@@ -26,7 +25,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 // DELETE api/users/:id
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!id) throw new Error("User ID is required");
 
   try {
     await dbConnect();
@@ -43,11 +41,12 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
 // PUT api/users/:id
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!id) throw new Error("User ID is required");
 
   try {
     const body = await request.json();
-    const validatedData = UserSchema.partial().parse(body);
+
+    const validatedData = UserSchema.partial().safeParse(body);
+    if (!validatedData.success) throw new ValidationError(validatedData.error.flatten().fieldErrors);
 
     const updatedUser = await User.findByIdAndUpdate(id, validatedData, { new: true });
     if (!updatedUser) throw new NotFoundError("User");
