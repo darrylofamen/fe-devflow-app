@@ -43,6 +43,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
 
   try {
+    await dbConnect();
+
     const body = await request.json();
 
     const validatedData = AccountSchema.partial().safeParse(body);

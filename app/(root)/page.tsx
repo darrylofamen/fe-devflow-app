@@ -4,6 +4,7 @@ import ROUTES from "@/constants/routes";
 import LocalSearch from "@/components/search/LocalSearch";
 import HomeFilter from "@/components/filters/HomeFilter";
 import QuestionCard from "@/components/cards/QuestionCard";
+import { api } from "@/lib/api";
 
 const questions = [
   {
@@ -98,6 +99,9 @@ interface SearchParams {
 
 const Home = async ({ searchParams }: SearchParams) => {
   // const session = await auth();
+  const users = await api.users.getAll();
+
+  console.log(users);
 
   const { query = "", filter = "" } = await searchParams;
 
