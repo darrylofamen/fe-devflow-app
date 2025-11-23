@@ -81,6 +81,7 @@ const Editor = ({
             "": "unspecified",
             tsx: "Typescript React",
             jsx: "Javascript React",
+            py: "Python",
           },
           autoLoadLanguageSupport: true,
           codeMirrorExtensions: theme,

@@ -45,3 +45,8 @@ type APIErrorResponse = NextResponse<ErrorResponse>;
 
 // Next.js API response for success OR error responses
 type APIResponse<T = null> = NextResponse<SuccessResponse<T> | ErrorResponse>;
+
+interface RouteParams {
+  params: Promise<Record<string, string>>;
+  searchParams: Promise<Record<string, string>>;
+}
