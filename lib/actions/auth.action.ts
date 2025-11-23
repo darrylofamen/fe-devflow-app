@@ -63,7 +63,9 @@ export async function signUpWithCredentials(params: AuthCredentials): Promise<Ac
   }
 }
 
-export async function signInWithCredentials(params: AuthCredentials): Promise<ActionResponse> {
+export async function signInWithCredentials(
+  params: Pick<AuthCredentials, "email" | "password">
+): Promise<ActionResponse> {
   const validationResult = await action({ params, schema: SignInSchema });
 
   if (validationResult instanceof Error) {
