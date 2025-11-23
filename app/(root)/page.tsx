@@ -4,7 +4,6 @@ import ROUTES from "@/constants/routes";
 import LocalSearch from "@/components/search/LocalSearch";
 import HomeFilter from "@/components/filters/HomeFilter";
 import QuestionCard from "@/components/cards/QuestionCard";
-import { auth } from "@/auth";
 
 const questions = [
   {
@@ -98,10 +97,6 @@ interface SearchParams {
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
-  const session = await auth();
-
-  console.log(session);
-
   const { query = "", filter = "" } = await searchParams;
 
   const lowerQuery = query?.toLowerCase() || "";
@@ -127,7 +122,7 @@ const Home = async ({ searchParams }: SearchParams) => {
       </section>
       <HomeFilter />
       <div className="mt-10 flex w-full flex-col gap-6">
-        {filteredQuestions.map((question, _) => {
+        {filteredQuestions.map((question) => {
           return <QuestionCard key={question._id} question={question} />;
         })}
       </div>

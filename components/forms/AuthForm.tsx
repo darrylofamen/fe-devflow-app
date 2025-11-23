@@ -33,14 +33,18 @@ const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSu
     const result = (await onSubmit(data as unknown as AuthCredentials)) as ActionResponse;
 
     if (result?.success) {
-      toast("Success", {
-        description: `${formType === "SIGN_IN" ? "Signed in successfully" : "Signed up successfully"}`,
-        style: {
-          backgroundColor: "#d4edda",
-          color: "#155724",
-          border: "1px solid #c3e6cb",
-        },
-      });
+      {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        formType === "SIGN_UP" &&
+          toast("Success", {
+            description: "Signed up successfully",
+            style: {
+              backgroundColor: "#d4edda",
+              color: "#155724",
+              border: "1px solid #c3e6cb",
+            },
+          });
+      }
 
       router.push(ROUTES.HOME);
     } else {
