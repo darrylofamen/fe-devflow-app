@@ -8,22 +8,50 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
+import { ActionResponse } from "@/types/global";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface AuthFormProps<T extends FieldValues> {
   schema: z.ZodType<T>;
   defaultValues: T;
   formType: "SIGN_IN" | "SIGN_UP";
-  onSubmit: (data: T) => Promise<{ success: boolean; data?: T }>;
+  onSubmit: (params: AuthCredentials) => Promise<ActionResponse>;
 }
 
 const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSubmit }: AuthFormProps<T>) => {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: standardSchemaResolver(schema),
     defaultValues: defaultValues as DefaultValues<T>,
   });
 
-  const handleSubmit: SubmitHandler<T> = async () => {
+  const handleSubmit: SubmitHandler<T> = async (data) => {
     // TODO: Authenticate User
+    const result = (await onSubmit(data as unknown as AuthCredentials)) as ActionResponse;
+
+    if (result?.success) {
+      toast("Success", {
+        description: `${formType === "SIGN_IN" ? "Signed in successfully" : "Signed up successfully"}`,
+        style: {
+          backgroundColor: "#d4edda",
+          color: "#155724",
+          border: "1px solid #c3e6cb",
+        },
+      });
+
+      router.push(ROUTES.HOME);
+    } else {
+      toast("Error", {
+        description: result?.errors?.message,
+        style: {
+          backgroundColor: "#f8d7da",
+          color: "#721c24",
+          border: "1px solid #f5c6cb",
+        },
+      });
+    }
   };
 
   const buttonText = formType === "SIGN_IN" ? "Sign in" : "Sign up";
@@ -60,7 +88,7 @@ const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSu
         })}
 
         <Button
-          className="primary-gradient paragraph-medium rounded-2 font-inter !text-light-900 min-h-12 w-full px-4 py-3"
+          className="primary-gradient paragraph-medium rounded-2 font-inter !text-light-900 min-h-12 w-full cursor-pointer px-4 py-3"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (buttonText === "Sign in" ? "Signing in..." : "Signing up...") : buttonText}

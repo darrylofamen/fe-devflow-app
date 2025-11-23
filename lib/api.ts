@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3
 
 export const api = {
   auth: {
-    oAuthSignIn: ({ user, provider, providerAccountId }: SignWithOAuthParams) =>
+    oAuthSignIn: ({ user, provider, providerAccountId }: SignInWithOAuthParams) =>
       fetchHandler(`${API_BASE_URL}/auth/signin-with-oauth/`, {
         method: "POST",
         body: JSON.stringify({ user, provider, providerAccountId }),
@@ -29,10 +29,10 @@ export const api = {
   accounts: {
     getAll: () => fetchHandler(`${API_BASE_URL}/accounts`),
     getById: (id: string) => fetchHandler(`${API_BASE_URL}/accounts/${id}`),
-    getByproviderAccountId: (getByproviderAccountId: string) =>
+    getByproviderAccountId: (providerAccountId: string) =>
       fetchHandler(`${API_BASE_URL}/accounts/provider/`, {
         method: "POST",
-        body: JSON.stringify({ getByproviderAccountId }),
+        body: JSON.stringify({ providerAccountId }),
       }),
     create: (data: Partial<IAccount>) =>
       fetchHandler(`${API_BASE_URL}/accounts/`, { method: "POST", body: JSON.stringify(data) }),

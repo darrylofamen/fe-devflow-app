@@ -26,7 +26,7 @@ interface Question {
 type ActionResponse<T = null> = {
   success: boolean; // Indicates if the action succeeded or failed
   data?: T; // Returned data when successful
-  error?: {
+  errors?: {
     // Error details when unsuccessful
     message: string; // Main error message
     details?: Record<string, string[]>;

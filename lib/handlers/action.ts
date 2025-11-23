@@ -1,5 +1,3 @@
-"use server";
-
 import { ZodError, ZodSchema } from "zod";
 import { UnauthorizedError, ValidationError } from "@/lib/http-errors";
 import { Session } from "next-auth";
