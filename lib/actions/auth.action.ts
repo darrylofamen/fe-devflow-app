@@ -8,7 +8,7 @@ import User from "@/database/user.model";
 import action from "../handlers/action";
 import handleError from "../handlers/error";
 import { ActionResponse, ErrorResponse } from "@/types/global";
-import { SignUpSchema } from "@/lib/validation";
+import { SignInSchema, SignUpSchema } from "@/lib/validation";
 import { signIn } from "@/auth";
 
 export async function signUpWithCredentials(params: AuthCredentials): Promise<ActionResponse> {
@@ -26,15 +26,11 @@ export async function signUpWithCredentials(params: AuthCredentials): Promise<Ac
   try {
     const existingUser = await User.findOne({ email }).session(session);
 
-    if (existingUser) {
-      throw new Error("User already exists");
-    }
+    if (existingUser) throw new Error("User already exists");
 
     const existingUsername = await User.findOne({ username }).session(session);
 
-    if (existingUsername) {
-      throw new Error("Username already exists");
-    }
+    if (existingUsername) throw new Error("Username already exists");
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -56,9 +52,7 @@ export async function signUpWithCredentials(params: AuthCredentials): Promise<Ac
     );
 
     await session.commitTransaction();
-
     await signIn("credentials", { email, password, redirect: false });
-
     return { success: true };
   } catch (error) {
     await session.abortTransaction();
@@ -66,5 +60,28 @@ export async function signUpWithCredentials(params: AuthCredentials): Promise<Ac
     return handleError(error) as ErrorResponse;
   } finally {
     await session.endSession();
+  }
+}
+
+export async function signInWithCredentials(params: AuthCredentials): Promise<ActionResponse> {
+  const validationResult = await action({ params, schema: SignInSchema });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { email, password } = validationResult.params!;
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) throw new Error("Email or password is incorrect");
+
+    const existingAccount = await Account.findOne({ provider: "credentials", providerAccountId: email });
+    if (!existingAccount) throw new Error("Email or password is incorrect");
+
+    await signIn("credentials", { email, password, redirect: false });
+    return { success: true };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
   }
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { DefaultValues, FieldValues, Path, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
 import { ActionResponse } from "@/types/global";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+
+import { toast } from "sonner";
 
 interface AuthFormProps<T extends FieldValues> {
   schema: z.ZodType<T>;
@@ -28,7 +30,6 @@ const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSu
   });
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
-    // TODO: Authenticate User
     const result = (await onSubmit(data as unknown as AuthCredentials)) as ActionResponse;
 
     if (result?.success) {
