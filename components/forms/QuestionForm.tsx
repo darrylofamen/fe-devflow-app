@@ -22,8 +22,8 @@ import { Question } from "@/types/global";
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
 interface Props {
-  question: Question;
-  isEdit: boolean;
+  question?: Question;
+  isEdit?: boolean;
 }
 
 const QuestionForm = ({ question, isEdit = false }: Props) => {
@@ -33,8 +33,8 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: standardSchemaResolver(AskQuestionSchema),
     defaultValues: {
-      title: isEdit ? question.title : "",
-      content: isEdit ? question.content : "",
+      title: isEdit ? question?.title : "",
+      content: isEdit ? question?.content : "",
       tags: isEdit ? question?.tags?.map((tag) => tag?.name) : [],
     },
   });

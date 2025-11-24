@@ -9,7 +9,7 @@ import Metric from "../Metric";
 import { Question, Tag } from "@/types/global";
 
 interface Props {
-  question: Question;
+  question: Pick<Question, "_id" | "title" | "tags" | "author" | "createdAt" | "upvotes" | "answers" | "views">;
 }
 
 const QuestionCard = ({ question: { _id, title, tags, author, createdAt, upvotes, answers, views } }: Props) => {
