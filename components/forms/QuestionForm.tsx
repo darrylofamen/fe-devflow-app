@@ -12,24 +12,30 @@ import React, { useRef, useTransition } from "react";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
 import TagCard from "@/components/cards/TagCard";
-import { createQuestion } from "@/lib/actions/question.action";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { toast } from "sonner";
 import ROUTES from "@/constants/routes";
 import { useRouter } from "next/navigation";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import { Question } from "@/types/global";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
-const QuestionForm = () => {
+interface Props {
+  question: Question;
+  isEdit: boolean;
+}
+
+const QuestionForm = ({ question, isEdit = false }: Props) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const editorRef = useRef<MDXEditorMethods>(null);
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: standardSchemaResolver(AskQuestionSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
+      title: isEdit ? question.title : "",
+      content: isEdit ? question.content : "",
+      tags: isEdit ? question?.tags?.map((tag) => tag?.name) : [],
     },
   });
 
@@ -72,8 +78,38 @@ const QuestionForm = () => {
 
   const handleCreateQuestion = async (data: z.infer<typeof AskQuestionSchema>) => {
     startTransition(async () => {
-      const result = await createQuestion(data);
+      // Edit existing question
+      if (isEdit && question) {
+        const result = await editQuestion({ ...data, questionId: question._id });
 
+        if (result?.success) {
+          {
+            toast("Success", {
+              description: "Question updated successfully",
+              style: {
+                backgroundColor: "#d4edda",
+                color: "#155724",
+                border: "1px solid #c3e6cb",
+              },
+            });
+          }
+          router.push(ROUTES.QUESTIONS(result?.data?._id as string));
+        } else {
+          toast("Error", {
+            description: result?.errors?.message,
+            style: {
+              backgroundColor: "#f8d7da",
+              color: "#721c24",
+              border: "1px solid #f5c6cb",
+            },
+          });
+        }
+
+        return;
+      }
+
+      // Create a new question
+      const result = await createQuestion(data);
       if (result?.success) {
         {
           toast("Success", {
@@ -191,7 +227,7 @@ const QuestionForm = () => {
                 <span>Submitting</span>
               </>
             ) : (
-              <>Ask A Question</>
+              <>{isEdit ? "Edit" : "Ask A Question"}</>
             )}
           </Button>
         </div>
