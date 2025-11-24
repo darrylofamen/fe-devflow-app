@@ -49,7 +49,7 @@ const AuthForm = <T extends FieldValues>({ formType, schema, defaultValues, onSu
       router.push(ROUTES.HOME);
     } else {
       toast("Error", {
-        description: result?.errors?.message,
+        description: result?.error?.message,
         style: {
           backgroundColor: "#f8d7da",
           color: "#721c24",

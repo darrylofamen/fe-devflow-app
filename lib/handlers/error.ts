@@ -13,7 +13,7 @@ const formatResponse = (
 ) => {
   const responseContent = {
     success: false,
-    errors: {
+    error: {
       message,
       details: errors,
     },

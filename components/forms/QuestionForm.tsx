@@ -96,7 +96,7 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
           router.push(ROUTES.QUESTIONS(result?.data?._id as string));
         } else {
           toast("Error", {
-            description: result?.errors?.message,
+            description: result?.error?.message,
             style: {
               backgroundColor: "#f8d7da",
               color: "#721c24",
@@ -124,7 +124,7 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
         router.push(ROUTES.QUESTIONS(result?.data?._id as string));
       } else {
         toast("Error", {
-          description: result?.errors?.message,
+          description: result?.error?.message,
           style: {
             backgroundColor: "#f8d7da",
             color: "#721c24",
