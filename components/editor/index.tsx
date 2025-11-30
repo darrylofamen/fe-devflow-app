@@ -1,11 +1,11 @@
 "use client";
 
-import type { ForwardedRef } from "react";
 import {
   BoldItalicUnderlineToggles,
   ChangeCodeMirrorLanguage,
   codeBlockPlugin,
   codeMirrorPlugin,
+  CodeToggle,
   ConditionalContents,
   CreateLink,
   diffSourcePlugin,
@@ -21,47 +21,44 @@ import {
   ListsToggle,
   markdownShortcutPlugin,
   MDXEditor,
-  type MDXEditorMethods,
-  type MDXEditorProps,
+  MDXEditorMethods,
   quotePlugin,
   Separator,
   tablePlugin,
-  thematicBreakPlugin,
   toolbarPlugin,
   UndoRedo,
 } from "@mdxeditor/editor";
-import "./dark-editor.css";
-import { useTheme } from "next-themes";
 import { basicDark } from "cm6-theme-basic-dark";
-import "@mdxeditor/editor/style.css";
+import { useTheme } from "next-themes";
+import { Ref } from "react";
 
-const Editor = ({
-  markdown,
-  fieldChange,
-  editorRef,
-  ...props
-}: {
-  markdown: string;
+import "@mdxeditor/editor/style.css";
+import "./dark-editor.css";
+
+interface Props {
+  value: string;
+  editorRef: Ref<MDXEditorMethods> | null;
   fieldChange: (value: string) => void;
-  editorRef: ForwardedRef<MDXEditorMethods> | null;
-} & MDXEditorProps) => {
+}
+
+const Editor = ({ value, editorRef, fieldChange }: Props) => {
   const { resolvedTheme } = useTheme();
-  const theme = resolvedTheme === "dark" ? [basicDark] : [];
+
+  const themeExtension = resolvedTheme === "dark" ? [basicDark] : [];
 
   return (
     <MDXEditor
       key={resolvedTheme}
-      className="background-light800_dark200 light-border-2 markdown-editor dark-editor w-full border"
-      markdown={markdown}
+      markdown={value}
       ref={editorRef}
       onChange={fieldChange}
+      className="background-light800_dark200 light-border-2 markdown-editor dark-editor grid w-full border"
       plugins={[
         headingsPlugin(),
         listsPlugin(),
         linkPlugin(),
         linkDialogPlugin(),
         quotePlugin(),
-        thematicBreakPlugin(),
         markdownShortcutPlugin(),
         tablePlugin(),
         imagePlugin(),
@@ -79,12 +76,11 @@ const Editor = ({
             js: "javascript",
             ts: "typescript",
             "": "unspecified",
-            tsx: "Typescript React",
-            jsx: "Javascript React",
-            py: "Python",
+            tsx: "TypeScript (React)",
+            jsx: "JavaScript (React)",
           },
           autoLoadLanguageSupport: true,
-          codeMirrorExtensions: theme,
+          codeMirrorExtensions: themeExtension,
         }),
         diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
         toolbarPlugin({
@@ -102,6 +98,7 @@ const Editor = ({
                       <Separator />
 
                       <BoldItalicUnderlineToggles />
+                      <CodeToggle />
                       <Separator />
 
                       <ListsToggle />
@@ -113,6 +110,7 @@ const Editor = ({
 
                       <InsertTable />
                       <InsertThematicBreak />
+                      <Separator />
 
                       <InsertCodeBlock />
                     </>
@@ -123,7 +121,6 @@ const Editor = ({
           ),
         }),
       ]}
-      {...props}
     />
   );
 };

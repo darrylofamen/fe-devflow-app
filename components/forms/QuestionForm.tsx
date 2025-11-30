@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import ROUTES from "@/constants/routes";
 import { useRouter } from "next/navigation";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { Question } from "@/types/global";
+import { ActionResponse, Question } from "@/types/global";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
@@ -80,7 +80,10 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
     startTransition(async () => {
       // Edit existing question
       if (isEdit && question) {
-        const result = await editQuestion({ ...data, questionId: question._id });
+        const result = (await editQuestion({
+          ...data,
+          questionId: question._id,
+        })) as unknown as ActionResponse<Question>;
 
         if (result?.success) {
           {
@@ -109,7 +112,7 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
       }
 
       // Create a new question
-      const result = await createQuestion(data);
+      const result = (await createQuestion(data)) as unknown as ActionResponse<Question>;
       if (result?.success) {
         {
           toast("Success", {
@@ -169,7 +172,7 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
                 Detailed explanation of your problem <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl>
-                <Editor markdown={field.value} editorRef={editorRef} fieldChange={field.onChange} />
+                <Editor value={(field.value as string) ?? ""} editorRef={editorRef} fieldChange={field.onChange} />
               </FormControl>
               <FormDescription className="body-regular text-light-500 mt-2.5">
                 Introduce the problem and expand on what you have put in the title.
@@ -192,11 +195,11 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
                   <Input
                     className="paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 no-focus min-h-[56px] border"
                     placeholder="Add tags..."
-                    onKeyDown={(e) => handleInputKeyDown(e, field)}
+                    onKeyDown={(e) => handleInputKeyDown(e, field as { value: string[] })}
                   />
-                  {field?.value?.length > 0 && (
+                  {Array.isArray(field?.value) && field.value.length > 0 && (
                     <div className="flex-start mt-2.5 flex-wrap gap-2.5">
-                      {field?.value?.map((tag) => (
+                      {(field.value ?? []).map((tag) => (
                         <TagCard
                           key={tag}
                           _id={tag}
@@ -204,7 +207,7 @@ const QuestionForm = ({ question, isEdit = false }: Props) => {
                           compact
                           remove
                           isButton
-                          handleRemove={() => handleTagRemove(tag, field)}
+                          handleRemove={() => handleTagRemove(tag, field as { value: string[] })}
                         />
                       ))}
                     </div>

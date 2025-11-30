@@ -14,20 +14,23 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { AnswerSchema } from "@/lib/validation";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { api } from "@/lib/api";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
 interface AnswerFormProps {
   questionId: string;
+  questionTitle: string;
+  questionContent: string;
 }
 
-const AnswerForm = ({ questionId }: AnswerFormProps) => {
+const AnswerForm = ({ questionId, questionTitle, questionContent }: AnswerFormProps) => {
   const [isPending, startTransition] = useTransition();
   const [isAISubmitting, setIsAISubmitting] = useState(false);
+  const session = useSession();
 
   const editorRef = useRef<MDXEditorMethods>(null);
-  // Force remount of the Editor when we want to hard-reset its content
-  const [editorKey, setEditorKey] = useState(0);
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
@@ -44,22 +47,19 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
       });
 
       if (result?.success) {
-        {
-          toast("Success", {
-            description: "Answer posted successfully",
-            style: {
-              backgroundColor: "#d4edda",
-              color: "#155724",
-              border: "1px solid #c3e6cb",
-            },
-          });
+        form.reset();
 
-          // Clear the editor and form after successful submission
-          editorRef.current?.setMarkdown("");
-          form.reset({ content: "" });
-          // In case the underlying editor ignores controlled value updates,
-          // remount it to guarantee a clean slate
-          setEditorKey((k) => k + 1);
+        toast("Success", {
+          description: "Answer posted successfully",
+          style: {
+            backgroundColor: "#d4edda",
+            color: "#155724",
+            border: "1px solid #c3e6cb",
+          },
+        });
+
+        if (editorRef.current) {
+          editorRef.current.setMarkdown("");
         }
       } else {
         toast("Error", {
@@ -74,6 +74,89 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
     });
   };
 
+  const generateAIAnswer = async () => {
+    if (session?.status !== "authenticated") {
+      return toast("Unauthorized", {
+        description: "You need to be logged in to generate an AI answer",
+        style: {
+          backgroundColor: "#f8d7da",
+          color: "#721c24",
+          border: "1px solid #f5c6cb",
+        },
+      });
+    }
+
+    try {
+      setIsAISubmitting(true);
+
+      const { success, data, error } = await api.ai.getAnswer(questionTitle, questionContent);
+
+      if (!success) {
+        return toast("Error", {
+          description: error?.message,
+          style: {
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            border: "1px solid #f5c6cb",
+          },
+        });
+      }
+
+      // Clean the AI response to handle problematic markdown elements
+      const cleanAIAnswer = (answer: string): string => {
+        return (
+          answer
+            // Remove horizontal rules (thematic breaks) that cause parsing issues
+            .replace(/^---$/gm, "")
+            .replace(/^___$/gm, "")
+            .replace(/^\*\*\*$/gm, "")
+            // Replace multiple newlines with single newlines
+            .replace(/\n{3,}/g, "\n\n")
+            // Trim whitespace
+            .trim()
+        );
+      };
+
+      const formattedAnswer = cleanAIAnswer(data as string);
+
+      if (editorRef.current) {
+        try {
+          editorRef.current.setMarkdown(formattedAnswer);
+          form.setValue("content", formattedAnswer);
+          form.trigger("content");
+        } catch (editorError) {
+          console.error("Editor error:", editorError);
+          // If there's still an error with the cleaned content, use a fallback
+          const fallbackAnswer = formattedAnswer.replace(/---/g, "--");
+          editorRef.current.setMarkdown(fallbackAnswer);
+          form.setValue("content", fallbackAnswer);
+          form.trigger("content");
+        }
+      }
+
+      toast("Success", {
+        description: "AI answer generated successfully",
+        style: {
+          backgroundColor: "#d4edda",
+          color: "#155724",
+          border: "1px solid #c3e6cb",
+        },
+      });
+    } catch (error) {
+      console.error("AI answer generation error:", error);
+      return toast("Error", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        style: {
+          backgroundColor: "#f8d7da",
+          color: "#721c24",
+          border: "1px solid #f5c6cb",
+        },
+      });
+    } finally {
+      setIsAISubmitting(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -81,6 +164,7 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
         <Button
           className="btn light-border-2 text-primary-500 dark:text-primary-500 cursor-pointer gap-1.5 rounded-md border px-4 py-2.5 shadow-none"
           disabled={isAISubmitting}
+          onClick={generateAIAnswer}
         >
           {isAISubmitting ? (
             <>
@@ -109,7 +193,7 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-3">
                 <FormControl>
-                  <Editor key={editorKey} markdown={field.value} editorRef={editorRef} fieldChange={field.onChange} />
+                  <Editor value={(field.value as string) ?? ""} editorRef={editorRef} fieldChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
