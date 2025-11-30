@@ -10,9 +10,11 @@ import { getQuestion, incrementViewCount } from "@/lib/actions/question.action";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import AnswerForm from "@/components/forms/AnswerForm";
+import { getAnswers } from "@/lib/actions/answer.action";
 
-const QuestionDetails = async ({ params }: RouteParams) => {
+const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
   const { id } = await params;
+  const { page, pageSize, filter = "" } = await searchParams;
   const { success, data } = await getQuestion({ questionId: id });
 
   // This will run after the response of await getQuestion is received and UI updates are rendered
@@ -25,6 +27,17 @@ const QuestionDetails = async ({ params }: RouteParams) => {
   const question = data as unknown as Question;
 
   if (!success || !question) return redirect("/404");
+
+  const {
+    success: answersLoaded,
+    data: answersResult,
+    error: answersError,
+  } = await getAnswers({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    questionId: id,
+    filter,
+  });
 
   const { author, createdAt, answers, views, tags, title, content } = question;
 

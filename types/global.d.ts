@@ -23,6 +23,13 @@ interface Question {
   createdAt: Date;
 }
 
+interface Answer {
+  _id: string;
+  author: Author;
+  content: string;
+  createdAt: Date;
+}
+
 // Base shape for all action responses (success or error)
 type ActionResponse<T = null> = {
   success: boolean; // Indicates if the action succeeded or failed
@@ -67,4 +74,8 @@ interface GetTagQuestionsParams extends PaginatedSearchParams {
 interface AnswerServerSchemaParams {
   questionId: string;
   content: string;
+}
+
+interface GetAnswersByQuestionIdParams extends PaginatedSearchParams {
+  questionId: string;
 }
