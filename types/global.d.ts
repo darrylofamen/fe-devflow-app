@@ -59,3 +59,7 @@ interface PaginatedSearchParams {
   filter?: string;
   sort?: string;
 }
+
+interface GetTagQuestionsParams extends PaginatedSearchParams {
+  tagId: string;
+}
