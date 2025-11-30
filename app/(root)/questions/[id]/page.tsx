@@ -9,6 +9,7 @@ import Preview from "@/components/editor/Preview";
 import { getQuestion, incrementViewCount } from "@/lib/actions/question.action";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
+import AnswerForm from "@/components/forms/AnswerForm";
 
 const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
@@ -84,6 +85,10 @@ const QuestionDetails = async ({ params }: RouteParams) => {
           <TagCard key={tag._id} _id={tag._id as string} name={tag.name} compact />
         ))}
       </div>
+
+      <section className="my-5">
+        <AnswerForm />
+      </section>
     </>
   );
 };
