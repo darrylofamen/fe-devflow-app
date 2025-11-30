@@ -29,3 +29,7 @@ interface EditQuestionParams extends CreateQuestionsParams {
 interface GetQuestionParams {
   questionId: string;
 }
+
+interface IncrementViewCountParams {
+  questionId: string;
+}

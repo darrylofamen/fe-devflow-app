@@ -6,6 +6,7 @@ import {
   AskQuestionSchema,
   EditQuestionSchema,
   GetQuestionSchema,
+  IncrementViewsSchema,
   PaginatedSearchParamsSchema,
 } from "@/lib/validation";
 import handleError from "@/lib/handlers/error";
@@ -266,6 +267,23 @@ export async function getQuestions(params: PaginatedSearchParams): Promise<
     const isNext = totalQuestions > skip + questions.length;
 
     return { success: true, data: { questions: JSON.parse(JSON.stringify(questions)), isNext } };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function incrementViewCount(params: IncrementViewCountParams) {
+  const validationResult = await action({
+    params,
+    schema: IncrementViewsSchema,
+  });
+
+  if (validationResult instanceof Error) return handleError(validationResult) as ErrorResponse;
+
+  const { questionId } = validationResult.params!;
+
+  try {
+    await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } }, { new: true });
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }

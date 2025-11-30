@@ -1,4 +1,4 @@
-import { RouteParams } from "@/types/global";
+import { Question, RouteParams } from "@/types/global";
 import UserAvatar from "@/components/UserAvatar";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
@@ -6,11 +6,22 @@ import Metric from "@/components/Metric";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
 import TagCard from "@/components/cards/TagCard";
 import Preview from "@/components/editor/Preview";
-import { getQuestion } from "@/lib/actions/question.action";
+import { getQuestion, incrementViewCount } from "@/lib/actions/question.action";
+import { redirect } from "next/navigation";
+import { after } from "next/server";
 
 const QuestionDetails = async ({ params }: RouteParams) => {
   const { id } = await params;
-  const { success, data: question } = await getQuestion({ questionId: id });
+  const { success, data } = await getQuestion({ questionId: id });
+
+  // This will run after the response of await getQuestion is received and UI updates are rendered
+  after(async () => {
+    await incrementViewCount({
+      questionId: id,
+    });
+  });
+
+  const question = data as unknown as Question;
 
   if (!success || !question) return redirect("/404");
 
@@ -76,4 +87,5 @@ const QuestionDetails = async ({ params }: RouteParams) => {
     </>
   );
 };
+
 export default QuestionDetails;
