@@ -1,10 +1,17 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { techMap } from "@/constants/techMap";
+import { techDescriptionMap, techMap } from "@/constants/techMap";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export const getTechDescription = (techName: string) => {
+  const normalizedTechName = techName.replace(/[ .]/g, "").toLowerCase();
+  return techDescriptionMap[normalizedTechName]
+    ? techDescriptionMap[normalizedTechName]
+    : `${techName} is a technology or tool widely used in web development, providing valuable features and capabilities.`;
+};
 
 export const getDeviconClassName = (techName: string) => {
   const normalizedTechName = techName.replace(/[ .]/g, "").toLowerCase();
@@ -35,3 +42,11 @@ export const getTimeStamp = (createAt: Date) => {
   }
   return "just now";
 };
+
+// Escapes special regex characters in a user-provided string so it can be used
+// to create a literal, case-insensitive RegExp for MongoDB searches.
+// Example: "C++" -> "C\+\+"
+export function escapeRegex(input: string) {
+  // Characters: . * + ? ^ $ { } ( ) | [ ] \
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

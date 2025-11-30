@@ -34,7 +34,13 @@ const Home = async ({ searchParams }: SearchParams) => {
         </Button>
       </section>
       <section className="mt-11">
-        <LocalSearch route="/" icon="/icons/search.svg" className="flex-1" placeholder="Search questions..." />
+        <LocalSearch
+          route="/"
+          icon="/icons/search.svg"
+          className="flex-1"
+          placeholder="Search questions..."
+          iconPosition="left"
+        />
       </section>
       <HomeFilter />
       <DataRenderer

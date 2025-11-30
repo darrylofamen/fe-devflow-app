@@ -6,6 +6,7 @@ import { PaginatedSearchParamsSchema } from "@/lib/validation";
 import handleError from "@/lib/handlers/error";
 import { FilterQuery } from "mongoose";
 import Tag, { ITagDoc } from "@/database/tag.model";
+import { escapeRegex } from "@/lib/utils";
 
 export async function getTags(params: PaginatedSearchParams): Promise<
   ActionResponse<{
@@ -22,9 +23,12 @@ export async function getTags(params: PaginatedSearchParams): Promise<
   const limit = Number(pageSize);
 
   const filterQuery: FilterQuery<typeof Tag> = {};
+  // Only include tags that have at least 1 associated question
+  filterQuery.questions = { $gte: 1 };
 
   if (query) {
-    filterQuery.$or = [{ name: { $regex: new RegExp(query, "i") } }];
+    const safe = escapeRegex(query);
+    filterQuery.$or = [{ name: { $regex: new RegExp(safe, "i") } }];
   }
 
   let sortCriteria = {};
