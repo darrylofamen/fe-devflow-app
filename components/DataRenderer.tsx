@@ -14,7 +14,7 @@ interface Props<T> {
   empty: {
     title: string;
     message: string;
-    button: {
+    button?: {
       text: string;
       href: string;
     };
@@ -80,7 +80,7 @@ const DataRenderer = <T,>({ success, error, data, empty = DEFAULT_EMPTY, render 
         }}
         title={empty.title}
         message={empty.message}
-        button={empty.button}
+        button={empty.button!}
       />
     );
 
