@@ -14,7 +14,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { AnswerSchema } from "@/lib/validation";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
@@ -25,9 +24,10 @@ interface AnswerFormProps {
 const AnswerForm = ({ questionId }: AnswerFormProps) => {
   const [isPending, startTransition] = useTransition();
   const [isAISubmitting, setIsAISubmitting] = useState(false);
-  const router = useRouter();
 
   const editorRef = useRef<MDXEditorMethods>(null);
+  // Force remount of the Editor when we want to hard-reset its content
+  const [editorKey, setEditorKey] = useState(0);
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
@@ -53,6 +53,13 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
               border: "1px solid #c3e6cb",
             },
           });
+
+          // Clear the editor and form after successful submission
+          editorRef.current?.setMarkdown("");
+          form.reset({ content: "" });
+          // In case the underlying editor ignores controlled value updates,
+          // remount it to guarantee a clean slate
+          setEditorKey((k) => k + 1);
         }
       } else {
         toast("Error", {
@@ -102,7 +109,7 @@ const AnswerForm = ({ questionId }: AnswerFormProps) => {
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-3">
                 <FormControl>
-                  <Editor markdown={field.value} editorRef={editorRef} fieldChange={field.onChange} />
+                  <Editor key={editorKey} markdown={field.value} editorRef={editorRef} fieldChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
