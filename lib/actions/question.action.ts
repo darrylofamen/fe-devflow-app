@@ -203,7 +203,7 @@ export async function getQuestion(params: GetQuestionParams): Promise<ActionResp
   const { questionId } = validationResult.params!;
 
   try {
-    const question = await Question.findById(questionId).populate("tags");
+    const question = await Question.findById(questionId).populate("author").populate("tags");
 
     if (!question) throw new Error("Question not found");
 

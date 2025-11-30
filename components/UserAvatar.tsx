@@ -2,15 +2,17 @@ import React from "react";
 import Link from "next/link";
 import ROUTES from "@/constants/routes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface Props {
   id: string;
   name: string;
   image?: string;
   className?: string;
+  fallbackClassName?: string;
 }
 
-const UserAvatar = ({ id, name, image, className = "h-9 w-9" }: Props) => {
+const UserAvatar = ({ id, name, image, className = "h-9 w-9", fallbackClassName }: Props) => {
   const initials = name
     .split(" ")
     .map((word) => word[0])
@@ -24,7 +26,9 @@ const UserAvatar = ({ id, name, image, className = "h-9 w-9" }: Props) => {
         {image ? (
           <AvatarImage src={image} alt={name} />
         ) : (
-          <AvatarFallback className="primary-gradient font-space-grotesk font-bold tracking-wide text-white">
+          <AvatarFallback
+            className={cn("primary-gradient font-space-grotesk font-bold tracking-wide text-white", fallbackClassName)}
+          >
             {initials}
           </AvatarFallback>
         )}
