@@ -63,3 +63,8 @@ interface PaginatedSearchParams {
 interface GetTagQuestionsParams extends PaginatedSearchParams {
   tagId: string;
 }
+
+interface AnswerServerSchemaParams {
+  questionId: string;
+  content: string;
+}

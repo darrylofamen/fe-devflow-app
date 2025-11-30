@@ -5,19 +5,27 @@ import { MDXEditorMethods } from "@mdxeditor/editor";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { AnswerSchema } from "@/lib/validation";
+import { createAnswer } from "@/lib/actions/answer.action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 
-const AnswerForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface AnswerFormProps {
+  questionId: string;
+}
+
+const AnswerForm = ({ questionId }: AnswerFormProps) => {
+  const [isPending, startTransition] = useTransition();
   const [isAISubmitting, setIsAISubmitting] = useState(false);
+  const router = useRouter();
 
   const editorRef = useRef<MDXEditorMethods>(null);
 
@@ -29,7 +37,34 @@ const AnswerForm = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof AnswerSchema>) => {
-    console.log(values);
+    startTransition(async () => {
+      const result = await createAnswer({
+        content: values.content,
+        questionId,
+      });
+
+      if (result?.success) {
+        {
+          toast("Success", {
+            description: "Answer posted successfully",
+            style: {
+              backgroundColor: "#d4edda",
+              color: "#155724",
+              border: "1px solid #c3e6cb",
+            },
+          });
+        }
+      } else {
+        toast("Error", {
+          description: result?.error?.message,
+          style: {
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            border: "1px solid #f5c6cb",
+          },
+        });
+      }
+    });
   };
 
   return (
@@ -76,7 +111,7 @@ const AnswerForm = () => {
 
           <div className="flex justify-end">
             <Button type="submit" className="primary-gradient w-fit cursor-pointer">
-              {isSubmitting ? (
+              {isPending ? (
                 <>
                   <ReloadIcon className="mr-2 size-4 animate-spin" />
                   Posting...
