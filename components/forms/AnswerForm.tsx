@@ -89,7 +89,9 @@ const AnswerForm = ({ questionId, questionTitle, questionContent }: AnswerFormPr
     try {
       setIsAISubmitting(true);
 
-      const { success, data, error } = await api.ai.getAnswer(questionTitle, questionContent);
+      const userAnswer = editorRef?.current?.getMarkdown() as string;
+
+      const { success, data, error } = await api.ai.getAnswer(questionTitle, questionContent, userAnswer);
 
       if (!success) {
         return toast("Error", {
@@ -102,19 +104,36 @@ const AnswerForm = ({ questionId, questionTitle, questionContent }: AnswerFormPr
         });
       }
 
-      // Clean the AI response to handle problematic markdown elements
+      // Clean the AI response to handle problematic markdown/HTML elements
       const cleanAIAnswer = (answer: string): string => {
-        return (
-          answer
-            // Remove horizontal rules (thematic breaks) that cause parsing issues
-            .replace(/^---$/gm, "")
-            .replace(/^___$/gm, "")
-            .replace(/^\*\*\*$/gm, "")
-            // Replace multiple newlines with single newlines
-            .replace(/\n{3,}/g, "\n\n")
-            // Trim whitespace
-            .trim()
-        );
+        let cleaned = answer ?? "";
+
+        // 1) Convert proper HTML anchors to Markdown links first
+        //    Example: <a href="https://x.com">Visit</a> -> [Visit](https://x.com)
+        cleaned = cleaned.replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_m, href, text) => {
+          const safeText = String(text).replace(/\s+/g, " ").trim();
+          const safeHref = String(href).trim();
+          if (!safeText) return `(${safeHref})`;
+          return `[${safeText}](${safeHref})`;
+        });
+
+        // 2) Remove any remaining stray <a> or </a> tags (unmatched or malformed)
+        cleaned = cleaned.replace(/<a\b[^>]*>/gi, "");
+        cleaned = cleaned.replace(/<\/a>/gi, "");
+
+        // 3) Remove horizontal rules (thematic breaks) that cause parsing issues
+        cleaned = cleaned
+          .replace(/^---$/gm, "")
+          .replace(/^___$/gm, "")
+          .replace(/^\*\*\*$/gm, "");
+
+        // 4) Replace excessive blank lines
+        cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
+
+        // 5) Trim whitespace
+        cleaned = cleaned.trim();
+
+        return cleaned;
       };
 
       const formattedAnswer = cleanAIAnswer(data as string);
