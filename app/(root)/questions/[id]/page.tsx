@@ -41,7 +41,7 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
     filter,
   });
 
-  const { author, createdAt, answers, views, tags, title, content, upvotes, downvotes } = question;
+  const { _id, author, createdAt, answers, views, tags, title, content, upvotes, downvotes } = question;
 
   return (
     <>
@@ -62,7 +62,14 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
           </div>
 
           <div className="flex justify-end">
-            <Votes upvotes={upvotes} downvotes={downvotes} hasUpvoted hasDownvoted />
+            <Votes
+              targetId={_id}
+              targetType="question"
+              upvotes={upvotes}
+              downvotes={downvotes}
+              hasUpvoted={false}
+              hasDownvoted={false}
+            />
           </div>
         </div>
 

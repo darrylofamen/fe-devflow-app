@@ -5,15 +5,18 @@ import Image from "next/image";
 import { cn, formatNumber } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { createVote } from "@/lib/actions/vote.action";
 
 interface Props {
+  targetId: string;
+  targetType: "question" | "answer";
   upvotes: number;
   downvotes: number;
   hasUpvoted: boolean;
   hasDownvoted: boolean;
 }
 
-const Votes = ({ upvotes, downvotes, hasUpvoted, hasDownvoted }: Props) => {
+const Votes = ({ targetId, targetType, upvotes, downvotes, hasUpvoted, hasDownvoted }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const session = useSession();
@@ -33,6 +36,13 @@ const Votes = ({ upvotes, downvotes, hasUpvoted, hasDownvoted }: Props) => {
 
     try {
       setIsLoading(true);
+
+      const result = await createVote({
+        targetId,
+        voteType,
+        targetType,
+      });
+
       const successMessage =
         voteType === "upvote"
           ? `Upvote ${!hasUpvoted ? "added" : "removed"} successfully`

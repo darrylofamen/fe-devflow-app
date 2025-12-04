@@ -33,3 +33,13 @@ interface GetQuestionParams {
 interface IncrementViewCountParams {
   questionId: string;
 }
+
+interface createVoteParams {
+  targetId: string;
+  targetType: "question" | "answer";
+  voteType: "upvote" | "downvote";
+}
+
+interface UpdateVoteCountParams extends createVoteParams {
+  change: number;
+}
