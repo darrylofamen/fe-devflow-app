@@ -51,7 +51,9 @@ const Home = async ({ searchParams }: SearchParams) => {
         render={(questions) => (
           <div className="mt-10 flex w-full flex-col gap-6">
             {questions.map((question) => {
-              return <QuestionCard key={question._id as string} question={question as unknown as Question} />;
+              return (
+                <QuestionCard key={question._id as unknown as string} question={question as unknown as Question} />
+              );
             })}
           </div>
         )}

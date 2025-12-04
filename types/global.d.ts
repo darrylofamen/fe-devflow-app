@@ -29,6 +29,8 @@ interface Answer {
   author: Author;
   content: string;
   createdAt: Date;
+  upvotes: number;
+  downvotes: number;
 }
 
 // Base shape for all action responses (success or error)

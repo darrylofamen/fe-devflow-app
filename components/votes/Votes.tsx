@@ -27,7 +27,6 @@ const Votes = ({ targetId, targetType, upvotes, downvotes, hasVotedPromise }: Pr
   const userId = session?.data?.user?.id;
 
   const handleVote = async (voteType: "upvotes" | "downvotes") => {
-    console.log(voteType);
     if (!userId) {
       return toast("Unauthorized", {
         description: "You need to be logged in to be able to vote",

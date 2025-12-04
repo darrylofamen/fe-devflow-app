@@ -1,5 +1,5 @@
 import React from "react";
-import { ActionResponse } from "@/types/global";
+import { ActionResponse, Answer } from "@/types/global";
 import { IAnswerDoc } from "@/database/answer.model";
 import DataRenderer from "@/components/DataRenderer";
 import { EMPTY_ANSWERS } from "@/constants/states";
@@ -21,9 +21,9 @@ const AllAnswers = ({ data, success, error, totalAnswers }: Props) => {
 
       <DataRenderer
         success={success}
-        data={data}
+        data={data as unknown as Answer[]}
         empty={EMPTY_ANSWERS}
-        render={(answers) => answers.map((answer) => <AnswerCard key={answer._id as string} {...answer} />)}
+        render={(answers: Answer[]) => answers.map((answer) => <AnswerCard key={answer._id as string} {...answer} />)}
       />
     </div>
   );
