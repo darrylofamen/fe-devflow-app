@@ -37,9 +37,19 @@ interface IncrementViewCountParams {
 interface createVoteParams {
   targetId: string;
   targetType: "question" | "answer";
-  voteType: "upvote" | "downvote";
+  voteType: "upvotes" | "downvotes";
 }
 
 interface UpdateVoteCountParams extends createVoteParams {
   change: number;
+}
+
+interface HasVotedParams {
+  targetId: string;
+  targetType: "question" | "answer";
+}
+
+interface HasVotedResponse {
+  hasUpvoted: boolean;
+  hasDownvoted: boolean;
 }

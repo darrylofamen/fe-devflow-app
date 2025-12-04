@@ -13,6 +13,8 @@ import AnswerForm from "@/components/forms/AnswerForm";
 import { getAnswers } from "@/lib/actions/answer.action";
 import AllAnswers from "@/components/answers/AllAnswers";
 import Votes from "@/components/votes/Votes";
+import { hasVoted } from "@/lib/actions/vote.action";
+import { Suspense } from "react";
 
 const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
   const { id } = await params;
@@ -41,6 +43,11 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
     filter,
   });
 
+  const hasVotedPromise = hasVoted({
+    targetId: question._id,
+    targetType: "question",
+  });
+
   const { _id, author, createdAt, answers, views, tags, title, content, upvotes, downvotes } = question;
 
   return (
@@ -62,14 +69,15 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
           </div>
 
           <div className="flex justify-end">
-            <Votes
-              targetId={_id}
-              targetType="question"
-              upvotes={upvotes}
-              downvotes={downvotes}
-              hasUpvoted={false}
-              hasDownvoted={false}
-            />
+            <Suspense fallback={<div className="text-sm">Loading...</div>}>
+              <Votes
+                targetId={_id}
+                targetType="question"
+                upvotes={upvotes}
+                downvotes={downvotes}
+                hasVotedPromise={hasVotedPromise}
+              />
+            </Suspense>
           </div>
         </div>
 

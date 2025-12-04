@@ -164,8 +164,8 @@ export const CreateVoteSchema = z.object({
   targetType: z.enum(["question", "answer"], {
     message: "Invalid target type. Must be 'question' or 'answer'.",
   }),
-  voteType: z.enum(["upvote", "downvote"], {
-    message: "Invalid vote type. Must be 'upvote' or 'downvote'.",
+  voteType: z.enum(["upvotes", "downvotes"], {
+    message: "Invalid vote type. Must be 'upvotes' or 'downvotes'.",
   }),
 });
 
